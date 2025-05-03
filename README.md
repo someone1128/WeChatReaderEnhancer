@@ -5,20 +5,37 @@
 
 ## 📖 项目简介
 
-公众号阅读增强插件是一款 Chrome 浏览器扩展，旨在提升用户阅读微信公众号文章的体验。通过自动生成文章的结构化目录，让您轻松了解文章结构、快速导航到感兴趣的部分，并在阅读长文时保持位置感知。
+公众号阅读增强插件是一款 Chrome 浏览器扩展，旨在提升用户在电脑上阅读微信公众号文章的体验。本插件提供多种功能增强，让阅读体验更加舒适高效。
+
+### 核心功能
+
+- **文章目录导航**：自动生成结构化目录，轻松了解文章结构并快速跳转
+- **图片查看增强**：点击文章图片可放大查看，支持全屏浏览
+- **阅读位置追踪**：滚动文章时，目录中自动高亮当前阅读位置
+- **界面定制优化**：精心设计的UI，不影响原文阅读体验
 
 ![插件预览](docs/images/preview.png)
 
-## ✨ 主要功能
+## ✨ 功能详解
 
-- **自动目录生成**: 识别文章中的 HTML 标题标签，生成结构化目录
-- **快速导航**: 点击目录项直接跳转到文章对应位置
-- **位置追踪**: 滚动文章时，目录中自动高亮当前阅读位置
-- **折叠与展开**: 支持多级目录的折叠与展开，方便浏览文章结构
+### 文章目录导航
+
+- **自动结构化**：智能识别文章中的标题层级，生成结构化目录
+- **快速跳转**：点击目录项直接跳转到文章对应位置，支持平滑滚动
+- **实时位置追踪**：根据阅读位置自动高亮对应目录项
+- **折叠与展开**：支持多级目录的折叠与展开，方便浏览长文结构
+- **界面适应**：可展开/折叠的侧栏设计，不占用阅读空间
+
+### 图片查看增强
+
+- **一键放大**：点击文章内任意图片，即可放大查看
+- **高清显示**：自动获取图片高清版本，提供最佳观看体验
+- **简洁控制**：简单的交互设计，点击图片外区域或ESC键即可关闭
+- **自动适配**：适配文章中的各种图片格式和大小
 
 ## 🚀 安装方式
 
-### 从 Chrome 网上应用店安装
+### 从 Chrome 网上应用店安装（推荐）
 
 1. 访问[Chrome 网上应用店](https://chrome.google.com/webstore/category/extensions)
 2. 搜索"公众号阅读增强插件"
@@ -28,22 +45,22 @@
 
 1. 克隆仓库
 
-```bash
-git clone https://github.com/username/WeChatReaderEnhancer.git
-cd WeChatReaderEnhancer
-```
+   ```bash
+   git clone https://github.com/username/WeChatReaderEnhancer.git
+   cd WeChatReaderEnhancer
+   ```
 
 2. 安装依赖
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 3. 构建项目
 
-```bash
-npm run build
-```
+   ```bash
+   npm run build
+   ```
 
 4. 在 Chrome 浏览器中加载扩展
    - 打开 chrome://extensions/
@@ -53,28 +70,35 @@ npm run build
 
 ## 🔧 使用指南
 
+### 文章目录功能
+
 1. 安装插件后访问任意微信公众号文章
-2. 插件会自动在页面右侧生成目录面板
+2. 插件会自动在页面左侧生成目录面板
 3. 点击目录项可跳转到相应位置
 4. 点击标题前的图标可展开或折叠子目录
-5. 使用右上角按钮可最小化或展开目录面板
+5. 点击竖向"文章目录"文字或展开按钮可展开折叠状态的目录
 
-详细使用说明请参阅[用户手册](docs/user-manual.md)。
+### 图片查看功能
+
+1. 点击文章中的任意图片即可放大查看
+2. 图片查看模式下，点击图片外的暗色区域可关闭查看器
+3. 按ESC键也可关闭图片查看器
 
 ## 📂 项目结构
 
 ```
 WeChatReaderEnhancer/
-├── src/                  # 源代码
-├── public/               # 静态资源
-├── dist/                 # 构建输出
-├── docs/                 # 文档
-│   ├── product-requirements.md  # 产品需求
-│   ├── technical-design.md      # 技术设计
-│   ├── ui-design.md             # UI设计
-│   ├── project-plan.md          # 项目计划
-│   └── faq.md                   # 常见问题
-└── README.md             # 项目说明
+├── src/                   # 源代码
+│   ├── background/        # 背景脚本
+│   ├── content/           # 内容脚本（目录、图片查看器等）
+│   ├── popup/             # 弹出窗口
+│   ├── styles/            # 样式文件
+│   ├── types/             # TypeScript类型定义
+│   └── utils/             # 工具函数
+├── public/                # 静态资源
+├── dist/                  # 构建输出
+├── docs/                  # 文档
+└── README.md              # 项目说明
 ```
 
 ## 🔨 开发指南
@@ -86,35 +110,42 @@ WeChatReaderEnhancer/
 
 ### 开发流程
 
-1. 安装依赖
+1. 克隆仓库并安装依赖
 
-```bash
-npm install
-```
+   ```bash
+   git clone https://github.com/username/WeChatReaderEnhancer.git
+   cd WeChatReaderEnhancer
+   npm install
+   ```
 
-2. 启动开发服务器
+2. 启动开发服务器（自动监听文件变化并重新构建）
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
 3. 构建生产版本
+   ```bash
+   npm run build
+   ```
 
-```bash
-npm run build
-```
+### 调试扩展
 
-4. 运行测试
+1. 在Chrome中打开 chrome://extensions/
+2. 启用"开发者模式"
+3. 点击"加载已解压的扩展程序"，选择项目的`dist`目录
+4. 访问任意微信公众号文章测试功能
 
-```bash
-npm test
-```
+## 🐛 常见问题
 
-详细开发文档请参阅[开发指南](docs/development-guide.md)。
+**Q: 为什么某些文章没有显示目录？**  
+A: 插件依赖文章中的HTML标题标签来生成目录。如果文章没有使用标准的h1-h6标签，可能无法正确生成目录。
 
-## 🤝 贡献指南
+**Q: 图片查看器不工作怎么办？**  
+A: 确保您点击的是文章正文中的图片，广告或其他特殊图片可能不支持查看功能。
 
-欢迎为项目提供贡献！请先阅读我们的[贡献指南](CONTRIBUTING.md)了解详情。
+**Q: 插件影响页面加载速度吗？**  
+A: 插件经过性能优化，对页面加载速度影响极小。它仅在页面完全加载后开始工作。
 
 ## 📄 许可证
 
@@ -124,8 +155,7 @@ npm test
 
 - 项目仓库: [GitHub](https://github.com/username/WeChatReaderEnhancer)
 - 问题反馈: [Issues](https://github.com/username/WeChatReaderEnhancer/issues)
-- 电子邮件: example@email.com
 
 ## 🙏 鸣谢
 
-感谢所有为本项目做出贡献的开发者和测试者。
+- [medium-zoom](https://github.com/francoischalifour/medium-zoom) - 提供优秀的图片缩放功能

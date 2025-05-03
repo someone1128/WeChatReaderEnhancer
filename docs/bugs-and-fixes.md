@@ -269,3 +269,330 @@ requestAnimationFrame(() => {
 4. 通过 `requestAnimationFrame` 可以将视觉更新与浏览器的渲染周期同步，减少闪烁和重绘
 5. 图片预加载是提高图片查看器响应速度的重要技术，能显著改善用户体验
 6. 减少DOM的布局影响（Layout Thrashing）是提高页面性能的关键
+
+### 5. 图片查看器重构为medium-zoom库
+
+**问题描述**：
+原有自定义图片查看器实现虽然功能完整，但存在一些边缘情况处理不当，且维护成本较高。同时，随着项目规模扩大，需要更成熟的图片查看解决方案。
+
+**解决方案**：
+
+1. 使用成熟的medium-zoom库（3.8k+ stars）替代自定义实现
+2. 保留对微信公众号特殊图片格式的支持（如data-src属性处理）
+3. 添加动态DOM观察，支持延迟加载的图片
+
+**实现细节**：
+
+1. 安装medium-zoom依赖：`npm install medium-zoom --save`
+2. 重构imageViewer.ts，使用medium-zoom API替代原有实现
+3. 添加data-zoom-src属性支持，处理微信图片高清链接
+4. 实现MutationObserver监听DOM变化，处理动态加载的图片
+5. 确保正确处理资源清理和内存回收
+
+**优势**：
+
+1. 代码更精简，降低维护成本
+2. 更好的兼容性，medium-zoom经过大量实际应用验证
+3. 性能优化更完善，提供更流畅的用户体验
+4. 支持更多高级功能（如自定义模板、事件系统）
+5. 更好的框架集成支持
+
+**关键代码**：
+
+```typescript
+import mediumZoom from "medium-zoom";
+
+// 保存zoom实例的引用，便于后续清理
+let zoom: ReturnType<typeof mediumZoom> | null = null;
+// 保存MutationObserver实例，用于观察新图片
+let observer: MutationObserver | null = null;
+
+export function initImageViewer(): void {
+  // 防止重复初始化
+  if (zoom) return;
+
+  try {
+    // 处理当前页面上的图片
+    processArticleImages();
+
+    // 初始化medium-zoom
+    zoom = mediumZoom("img.rich_pages, img.wxw-img", {
+      background: "rgba(0, 0, 0, 0.85)",
+      margin: 24,
+      scrollOffset: 0,
+    });
+
+    // 设置MutationObserver观察DOM变化
+    setupImageObserver();
+  } catch (error) {
+    console.error("图片查看器初始化失败:", error);
+  }
+}
+```
+
+**经验教训**：
+
+1. 不要重复造轮子，优先考虑使用成熟的开源库
+2. 在引入第三方库时，需要评估其性能、维护状态和生态系统
+3. 即使使用第三方库，也需要处理好特定场景的适配（如微信图片格式）
+4. 动态DOM观察是处理现代Web应用延迟加载内容的有效方式
+5. 保持代码模块化，即使替换底层实现也能保持API一致性
+
+### 6. 图片查看器功能增强
+
+**问题描述**：
+使用medium-zoom库替代自定义实现后，仍需要一些额外功能来增强用户体验，包括：更精细的缩放控制、图片下载功能，以及性能优化。
+
+**解决方案**：
+
+1. 性能优化：
+
+   - 添加节流函数(throttle)，减少MutationObserver触发的处理频率
+   - 优化图片处理逻辑，使用异步处理避免阻塞主线程
+   - 简化DOM节点检测，提高观察器效率
+
+2. 添加图片控制功能：
+   - 实现图片放大/缩小按钮，允许用户手动调整缩放级别
+   - 添加图片下载按钮，支持保存高清图片
+   - 添加重置按钮，快速恢复到默认缩放状态
+
+**实现细节**：
+
+1. 节流函数实现，限制高频操作：
+
+```typescript
+function throttle<T extends (...args: any[]) => any>(
+  fn: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let lastCall = 0;
+  return function (this: any, ...args: Parameters<T>) {
+    const now = Date.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn.apply(this, args);
+    }
+  };
+}
+```
+
+2. 图片下载功能：
+
+```typescript
+function downloadImage(): void {
+  if (!currentImageUrl) return;
+
+  try {
+    // 创建一个临时链接
+    const a = document.createElement("a");
+    a.href = currentImageUrl;
+
+    // 提取文件名
+    let filename = "image.jpg";
+    const urlParts = currentImageUrl.split("/");
+    // ...文件名提取逻辑...
+
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch (error) {
+    // 备用下载方法: 打开新标签
+    window.open(currentImageUrl, "_blank");
+  }
+}
+```
+
+3. 图片缩放控制：
+
+```typescript
+function zoomInImage(): void {
+  if (!zoom) return;
+
+  const zoomedImage = document.querySelector(".medium-zoom-image--opened");
+  if (zoomedImage instanceof HTMLElement) {
+    currentZoomLevel = Math.min(currentZoomLevel + 0.25, 3);
+    zoomedImage.style.transform = `scale(${currentZoomLevel})`;
+  }
+}
+
+function zoomOutImage(): void {
+  // ...类似缩小逻辑...
+}
+
+function resetZoom(): void {
+  // ...重置缩放逻辑...
+}
+```
+
+**优势**：
+
+1. 改进的性能处理减少了插件对页面性能的影响
+2. 新增的下载功能解决了用户保存图片的需求
+3. 缩放控制提供了比默认更灵活的图片查看体验
+4. 控件UI设计简洁直观，易于使用
+
+**经验教训**：
+
+1. 对于高频触发的事件处理，节流函数是提高性能的有效手段
+2. 扩展现有功能时，可以利用DOM操作添加自定义控件
+3. 图片操作需要考虑兼容性和错误处理，提供备用方案
+4. 使用CSS过渡效果可以提升UI交互的流畅感
+5. UI控件应当设计得简洁明了，功能符合用户直觉
+
+### 7. 图片查看器缩放控制冲突修复
+
+**问题描述**：
+使用medium-zoom库实现图片查看功能后，添加的自定义缩放控制（放大/缩小/重置）与medium-zoom内部的缩放机制发生冲突，导致出现双重图片或缩放异常。
+
+**原因分析**：
+
+1. 直接通过CSS `transform: scale()` 修改已打开的图片元素样式，干扰了medium-zoom库的内部工作机制
+2. medium-zoom库通过克隆图片并自行管理transform样式来实现缩放效果
+3. 我们的自定义缩放作用在medium-zoom创建的元素上，导致两种缩放机制冲突
+
+**解决方案**：
+
+1. 重新设计缩放控制实现方式，使用medium-zoom的API而非直接修改DOM
+2. 通过关闭当前查看的图片，调整缩放参数后再重新打开的方式实现不同缩放级别
+3. 调整margin参数来配合缩放级别，保持合适的边距比例
+4. 删除下载功能，专注于提供高质量的缩放体验
+
+**实现细节**：
+
+```typescript
+// 定义缩放常量
+const DEFAULT_MARGIN = 40;
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.25;
+
+function zoomInImage(): void {
+  if (!zoom || !currentImageElement) return;
+
+  // 计算新的缩放级别
+  currentZoomLevel = Math.min(currentZoomLevel + ZOOM_STEP, MAX_ZOOM);
+
+  // 关闭当前查看的图片
+  zoom.close().then(() => {
+    if (!zoom || !currentImageElement) return;
+
+    // 更新margin以适应缩放级别
+    zoom.update({
+      margin: DEFAULT_MARGIN / currentZoomLevel,
+    });
+
+    // 重新打开图片
+    zoom.open({ target: currentImageElement });
+  });
+}
+```
+
+**经验教训**：
+
+1. 使用第三方库时，需要深入理解其实现原理，避免干扰其内部工作机制
+2. 扩展现有功能时，优先考虑通过API而不是修改DOM来实现
+3. 当两种技术方案发生冲突时，应重新审视实现方式，寻找更协调的解决方案
+4. 正确使用Promise和异步操作确保UI操作的顺序性
+5. 简化功能有时比添加多种功能更重要，专注于核心体验
+
+### 8. 精简图片查看器功能
+
+**问题描述**：
+自定义缩放控制功能（放大/缩小/重置按钮）在实际使用中存在问题，点击按钮没有产生预期的缩放效果，反而导致图片关闭。这降低了用户体验，造成功能混乱。
+
+**原因分析**：
+
+1. medium-zoom库的API使用方式与预期不符
+2. 实现的缩放逻辑（先close再open）导致交互不流畅
+3. 添加的自定义控件与medium-zoom内置行为之间存在冲突
+4. 复杂功能增加了代码维护难度
+
+**解决方案**：
+
+1. 完全移除自定义缩放控制功能
+2. 恢复至medium-zoom库的基础功能
+3. 简化代码，删除所有与缩放控制相关的变量、函数和事件处理
+4. 专注于提供简单可靠的图片查看体验
+
+**实现细节**：
+
+```typescript
+// 初始化medium-zoom，针对微信公众号文章中的图片
+zoom = mediumZoom("img.rich_pages, img.wxw-img", {
+  background: "rgba(0, 0, 0, 0.85)",
+  margin: 40,
+  scrollOffset: 0,
+});
+```
+
+**经验教训**：
+
+1. 简单胜于复杂，提供简单可靠的功能比提供不稳定的高级功能更重要
+2. 在扩展第三方库功能时，需谨慎测试各种边缘情况
+3. 当功能实现过于复杂或不稳定时，应考虑回退到更简单的方案
+4. 功能设计应以用户体验为中心，避免过度工程化
+5. medium-zoom库本身已提供良好的图片查看体验，无需过多定制
+
+### 9. 侧边栏状态持久化
+
+**问题描述**：
+用户设置的侧边栏展开/折叠状态在页面刷新或重新打开后无法保持，每次重新打开文章都会重置为展开状态，影响用户体验。
+
+**原因分析**：
+
+1. 之前侧边栏状态使用localStorage存储，但这种存储方式不适合跨页面和跨会话持久化
+2. localStorage在部分情况下可能被清除或不可用
+3. 初始化逻辑中，优先考虑了settings中的autoExpand设置，而不是用户最后的选择
+
+**解决方案**：
+
+1. 将存储方式从localStorage改为chrome.storage.local
+2. 添加错误处理和降级机制，确保在chrome.storage不可用时仍能保持基本功能
+3. 优化初始化逻辑，优先使用用户上次的选择，而不是默认设置
+
+**实现细节**：
+
+```typescript
+// 保存状态到chrome.storage
+try {
+  // @ts-ignore
+  chrome.storage.local.set({ "wechat-toc-minimized": true });
+} catch (error) {
+  console.error("保存目录状态失败:", error);
+  // 降级到localStorage作为备用
+  localStorage.setItem("wechat-toc-minimized", "true");
+}
+
+// 恢复状态
+try {
+  // @ts-ignore
+  chrome.storage.local.get("wechat-toc-minimized", (result) => {
+    if (result && "wechat-toc-minimized" in result) {
+      if (result["wechat-toc-minimized"] === true) {
+        minimizeTocPanel();
+      } else {
+        expandTocPanel();
+      }
+    } else {
+      // 降级到localStorage
+      // ...
+    }
+  });
+} catch (error) {
+  // 错误处理...
+}
+```
+
+**优势**：
+
+1. 使用chrome.storage.local存储数据，在浏览器重启后也能保持状态
+2. 添加了错误处理机制，提高了代码的健壮性
+3. 提供了降级策略，在出现问题时仍能保持基本功能
+
+**经验教训**：
+
+1. 对于需要持久化的用户偏好设置，应使用chrome.storage而非localStorage
+2. 功能实现需要考虑异常情况和降级策略
+3. 用户体验的细节（如记住用户的UI状态偏好）对整体印象有重要影响
+4. 优先考虑用户的实际选择，而不是开发者预设的默认值

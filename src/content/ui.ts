@@ -29,10 +29,10 @@ export function createTocContainer(
   title: string,
   settings: Settings
 ): HTMLElement {
-  // 创建目录容器元素
+  // 创建目录容器元素 - 默认为展开状态
   tocContainer = createElement("div", {
     id: "wechat-toc-container",
-    class: "wechat-toc-container",
+    class: "wechat-toc-container", // 默认展开
     style: `width: ${settings.tocWidth}px;`,
   });
 
@@ -112,14 +112,11 @@ export function createTocContainer(
     expandTocPanel();
   });
 
-  tocContainer.appendChild(verticalText);
+  // 添加到页面
+  document.body.appendChild(verticalText);
 
-  // 默认展开状态
-  if (settings.autoExpand) {
-    expandTocPanel();
-  } else {
-    minimizeTocPanel();
-  }
+  // 立即调用状态恢复，检查用户是否明确选择了收缩状态
+  restorePanelState();
 
   return tocContainer;
 }
@@ -358,8 +355,15 @@ export function minimizeTocPanel(): void {
 
   addClass(tocContainer, "wechat-toc-minimized");
 
-  // 存储状态
-  localStorage.setItem("wechat-toc-minimized", "true");
+  // 使用chrome.storage.local代替localStorage存储状态
+  try {
+    // @ts-ignore
+    chrome.storage.local.set({ "wechat-toc-minimized": true });
+  } catch (error) {
+    console.error("保存目录状态失败:", error);
+    // 降级到localStorage作为备用
+    localStorage.setItem("wechat-toc-minimized", "true");
+  }
 }
 
 /**
@@ -370,20 +374,48 @@ export function expandTocPanel(): void {
 
   removeClass(tocContainer, "wechat-toc-minimized");
 
-  // 存储状态
-  localStorage.setItem("wechat-toc-minimized", "false");
+  // 使用chrome.storage.local代替localStorage存储状态
+  try {
+    // @ts-ignore
+    chrome.storage.local.set({ "wechat-toc-minimized": false });
+  } catch (error) {
+    console.error("保存目录状态失败:", error);
+    // 降级到localStorage作为备用
+    localStorage.setItem("wechat-toc-minimized", "false");
+  }
 }
 
 /**
  * 根据存储的状态恢复面板状态
  */
 export function restorePanelState(): void {
-  const minimized = localStorage.getItem("wechat-toc-minimized");
-
-  if (minimized === "true") {
-    minimizeTocPanel();
-  } else {
-    expandTocPanel();
+  try {
+    // 尝试从chrome.storage.local获取状态
+    // @ts-ignore
+    chrome.storage.local.get("wechat-toc-minimized", (result) => {
+      // 如果找到存储的状态且明确为收缩，则收缩面板
+      if (result && "wechat-toc-minimized" in result) {
+        if (result["wechat-toc-minimized"] === true) {
+          minimizeTocPanel();
+        }
+        // 如果为false或未定义，默认为展开状态，不需要操作
+      } else {
+        // 如果chrome.storage中没有，尝试从localStorage中获取
+        const minimized = localStorage.getItem("wechat-toc-minimized");
+        if (minimized === "true") {
+          minimizeTocPanel();
+        }
+        // 如果为"false"或null，默认为展开状态，不需要操作
+      }
+    });
+  } catch (error) {
+    console.error("恢复目录状态失败:", error);
+    // 如果chrome.storage失败，降级到localStorage
+    const minimized = localStorage.getItem("wechat-toc-minimized");
+    if (minimized === "true") {
+      minimizeTocPanel();
+    }
+    // 如果为"false"或null，默认为展开状态，不需要操作
   }
 }
 
