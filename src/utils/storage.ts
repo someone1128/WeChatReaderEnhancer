@@ -15,7 +15,6 @@ export function getSettings(): Promise<Settings> {
       // 默认设置
       const defaultSettings: Settings = {
         tocWidth: 280,
-        autoExpand: true,
         minLevel: 1,
         maxLevel: 6,
         isEnabled: true,

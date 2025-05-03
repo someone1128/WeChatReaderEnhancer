@@ -13,7 +13,6 @@ chrome.runtime.onInstalled.addListener(
       // 初始化默认设置
       const defaultSettings: Settings = {
         tocWidth: 280, // 目录宽度
-        autoExpand: true, // 自动展开目录
         minLevel: 1, // 识别的最小标题级别
         maxLevel: 6, // 识别的最大标题级别
         isEnabled: true, // 插件是否启用

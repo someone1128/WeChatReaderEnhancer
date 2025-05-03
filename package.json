@@ -4,15 +4,16 @@
     "description": "为微信公众号文章生成结构化目录，提升阅读体验",
     "main": "dist/background.js",
     "scripts": {
-        "dev": "webpack --watch --config webpack.config.js --mode=development",
-        "build": "webpack --config webpack.config.js --mode=production",
+        "dev": "webpack --mode development --watch",
+        "build": "webpack --mode production",
         "test": "jest",
         "lint": "eslint src --ext .ts",
-        "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\""
+        "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\"",
+        "zip": "npm run build && powershell -Command \"Compress-Archive -Path dist\\* -DestinationPath dist.zip\""
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/username/wechat-reader-enhancer.git"
+        "url": "git+https://github.com/someone1128/WeChatReaderEnhancer.git"
     },
     "keywords": [
         "chrome-extension",
@@ -24,9 +25,9 @@
     "author": "",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/username/wechat-reader-enhancer/issues"
+        "url": "https://github.com/someone1128/WeChatReaderEnhancer/issues"
     },
-    "homepage": "https://github.com/username/wechat-reader-enhancer#readme",
+    "homepage": "https://github.com/someone1128/WeChatReaderEnhancer",
     "devDependencies": {
         "@types/chrome": "^0.0.246",
         "@types/jest": "^29.5.5",

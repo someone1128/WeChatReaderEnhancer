@@ -79,9 +79,13 @@ export function createTocContainer(
     class: "wechat-toc-list",
   });
 
+  // 创建页脚区域
+  const footer = createFooter();
+
   // 组装目录容器
   tocContainer.appendChild(header);
   tocContainer.appendChild(tocList);
+  tocContainer.appendChild(footer); // 添加页脚
 
   // 添加最小化状态下的展开按钮
   const expandButton = createElement(
@@ -441,4 +445,65 @@ export function getTocList(): HTMLElement | null {
  */
 export function getProgressBar(): HTMLElement | null {
   return progressBar;
+}
+
+// 创建页脚内容的辅助函数
+function createFooter(): HTMLElement {
+  const footer = createElement("div", {
+    class: "wechat-toc-footer",
+  });
+
+  const socialLinks = [
+    {
+      name: "即刻",
+      url: "https://web.okjike.com/u/ec41d7d5-407d-4395-ac8a-bd0f04fb202c",
+      icon: "即刻.png",
+    },
+    {
+      name: "哔哩哔哩",
+      url: "https://space.bilibili.com/444418069",
+      icon: "哔哩哔哩.png",
+    },
+    {
+      name: "小红书",
+      url: "https://www.xiaohongshu.com/user/profile/63eccfa2000000002600707d",
+      icon: "小红书.png",
+    },
+  ];
+
+  const linksContainer = createElement("div", {
+    class: "wechat-toc-footer-links",
+  });
+
+  socialLinks.forEach((linkInfo) => {
+    const link = createElement("a", {
+      href: linkInfo.url,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      title: `访问我的${linkInfo.name}主页`,
+      class: "wechat-toc-footer-link",
+    });
+
+    const img = createElement("img", {
+      src: `./logo/${linkInfo.icon}`, // 初始设置相对路径
+      alt: linkInfo.name,
+      class: "wechat-toc-footer-icon",
+    });
+
+    // 尝试使用 chrome.runtime.getURL 获取正确路径
+    try {
+      img.src = chrome.runtime.getURL(`logo/${linkInfo.icon}`);
+    } catch (e) {
+      console.error(`无法获取页脚图标 URL: logo/${linkInfo.icon}`, e);
+      // 保留原始路径或显示文字
+      link.textContent = linkInfo.name; // 如果图片加载失败，显示文字
+    }
+
+    link.appendChild(img);
+    linksContainer.appendChild(link);
+  });
+
+  footer.appendChild(linksContainer);
+
+  return footer;
 }

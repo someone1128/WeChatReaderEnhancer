@@ -15,7 +15,6 @@ export interface TocItem {
 // 插件设置
 export interface Settings {
   tocWidth: number; // 目录宽度
-  autoExpand: boolean; // 自动展开目录
   minLevel: number; // 识别的最小标题级别
   maxLevel: number; // 识别的最大标题级别
   isEnabled: boolean; // 插件是否启用

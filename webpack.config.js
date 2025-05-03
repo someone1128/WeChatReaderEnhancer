@@ -30,8 +30,10 @@ module.exports = {
       patterns: [
         { from: "public/manifest.json", to: "manifest.json" },
         { from: "public/icons", to: "icons" },
+        { from: "public/logo", to: "logo" },
         { from: "public/toc.css", to: "toc.css" },
         { from: "src/styles/imageViewer.css", to: "imageViewer.css" },
+        { from: "public/images", to: "images", noErrorOnMissing: true },
       ],
     }),
     new HtmlWebpackPlugin({

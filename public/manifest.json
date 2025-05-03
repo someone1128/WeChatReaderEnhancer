@@ -38,10 +38,13 @@
             "resources": [
                 "icons/*",
                 "toc.css",
-                "imageViewer.css"
+                "imageViewer.css",
+                "logo/*",
+                "images/*"
             ],
             "matches": [
-                "https://mp.weixin.qq.com/*"
+                "https://mp.weixin.qq.com/*",
+                "<all_urls>"
             ]
         }
     ],

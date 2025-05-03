@@ -101,7 +101,7 @@ Chrome 浏览器会自动更新已安装的扩展程序。您也可以在"扩展
 
 ### 我发现了 bug 或有新功能建议，如何反馈？
 
-请访问我们的 GitHub 仓库(https://github.com/username/wechat-reader-enhancer)提交问题或建议。您也可以通过Chrome商店的评论区留下反馈。
+请访问我们的 GitHub 仓库(https://github.com/someone1128/WeChatReaderEnhancer)提交问题或建议。您也可以通过Chrome商店的评论区留下反馈。
 
 ### 未来版本会添加什么新功能？
 

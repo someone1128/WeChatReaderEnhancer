@@ -174,18 +174,58 @@ function handleSettingsChange(newSettings: Settings): void {
 }
 
 /**
- * 监听来自背景脚本的消息
+ * 监听来自背景脚本或 popup 的消息
  */
 // @ts-ignore
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "SETTINGS_CHANGED") {
-    handleSettingsChange(message.settings);
-    sendResponse({ success: true });
-  } else if (message.type === "CLEAN_SCRIPT_LEAK") {
-    // 手动触发脚本泄露清理
-    detectAndCleanScriptLeak();
-    sendResponse({ success: true });
+  // 在处理任何消息之前，检查文档上下文是否仍然有效
+  if (!document.body) {
+    console.warn(
+      "onMessage: Document body not found, context might be invalid. Aborting message handler."
+    );
+    // 返回 true 表示将异步发送响应，但我们这里不发送了
+    // 或者可以尝试同步返回 { success: false } 或 undefined
+    return true;
   }
+
+  try {
+    if (message.type === "SETTINGS_CHANGED") {
+      console.log("Received SETTINGS_CHANGED message", message.settings);
+      handleSettingsChange(message.settings);
+      sendResponse({ success: true });
+    } else if (message.type === "CLEAN_SCRIPT_LEAK") {
+      console.log("Received CLEAN_SCRIPT_LEAK message");
+      // 手动触发脚本泄露清理
+      detectAndCleanScriptLeak();
+      sendResponse({ success: true });
+    } else {
+      // 处理未知消息类型，可以选择忽略或记录
+      console.log("Received unknown message type:", message.type);
+      // 如果不处理，最好不要调用 sendResponse 或返回 true
+    }
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Extension context invalidated")
+    ) {
+      console.warn(
+        "Caught 'Extension context invalidated' error in onMessage listener. Ignoring."
+      );
+      // 此时可能无法安全地发送响应
+    } else {
+      console.error("Error in onMessage listener:", error);
+      // 也可以尝试发送错误响应，但不保证成功
+      // sendResponse({ success: false, error: error.message });
+    }
+  }
+
+  // 对于异步响应，确保返回 true
+  // 如果所有路径都同步调用 sendResponse，则可以不返回 true
+  // 在这个实现中，所有已知路径都同步调用了 sendResponse，但为了保险起见或处理未知消息类型，返回 true 可能是更安全的选择，
+  // 尽管这可能导致 Chrome 在某些情况下报告"消息端口关闭"的错误，如果 sendResponse 最终没有被调用。
+  // 如果我们确定所有分支都能同步响应，可以移除 return true。
+  // 考虑到上面的 early return，以及 catch 块可能不发送响应，保留 return true 可能是必要的，让 Chrome 知道响应可能是异步的。
+  return true;
 });
 
 // 页面加载完成后初始化
