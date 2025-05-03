@@ -27,6 +27,19 @@
             ],
             "css": [
                 "toc.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "icons/*",
+                "toc.css",
+                "imageViewer.css"
+            ],
+            "matches": [
+                "https://mp.weixin.qq.com/*"
             ]
         }
     ],

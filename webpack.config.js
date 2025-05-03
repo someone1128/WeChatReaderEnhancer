@@ -1,53 +1,48 @@
-const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: {
-    background: './src/background/index.ts',
-    content: './src/content/index.ts',
-    popup: './src/popup/index.ts',
+    popup: "./src/popup/index.ts",
+    content: "./src/content/index.ts",
+    background: "./src/background/index.ts",
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
+    filename: "[name].js",
+    path: path.resolve(__dirname, "dist"),
     clean: true,
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: "ts-loader",
         exclude: /node_modules/,
-      },
-      {
-        test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: [".tsx", ".ts", ".js"],
   },
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: 'public', to: '' },
+        { from: "public/manifest.json", to: "manifest.json" },
+        { from: "public/icons", to: "icons" },
+        { from: "public/toc.css", to: "toc.css" },
+        { from: "src/styles/imageViewer.css", to: "imageViewer.css" },
       ],
     }),
     new HtmlWebpackPlugin({
-      template: './src/popup/index.html',
-      filename: 'popup.html',
-      chunks: ['popup'],
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
+      template: "src/popup/index.html",
+      filename: "popup.html",
+      chunks: ["popup"],
     }),
   ],
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      chunks: "async",
     },
   },
-}; 
+};

@@ -14,6 +14,8 @@ import {
   getTocList,
 } from "./ui";
 import { initScrollObserver, destroyScrollObserver } from "./observer";
+import { initImageViewer, destroyImageViewer } from "./imageViewer";
+import { detectAndCleanScriptLeak } from "../utils/safeDOM";
 
 // 全局变量
 let tocItems: TocItem[] = [];
@@ -30,6 +32,9 @@ async function init(): Promise<void> {
   try {
     console.log("公众号阅读增强插件启动中...");
 
+    // 先检测并清理可能的脚本泄露
+    detectAndCleanScriptLeak();
+
     // 获取插件设置
     settings = await getSettings();
 
@@ -45,6 +50,9 @@ async function init(): Promise<void> {
         window.addEventListener("load", () => resolve());
       });
     }
+
+    // 再次检测并清理可能的脚本泄露（页面完全加载后）
+    detectAndCleanScriptLeak();
 
     // 查找文章容器
     const articleContainer = findArticleContainer();
@@ -97,6 +105,12 @@ async function init(): Promise<void> {
     // 初始化滚动监听
     initScrollObserver(tocItems);
 
+    // 初始化图片查看器
+    initImageViewer();
+
+    // 设置定期检查脚本泄露
+    setInterval(detectAndCleanScriptLeak, 5000);
+
     // 标记为已初始化
     isInitialized = true;
 
@@ -118,6 +132,9 @@ function cleanup(): void {
 
   // 销毁滚动监听器
   destroyScrollObserver();
+
+  // 销毁图片查看器
+  destroyImageViewer();
 
   // 重置状态
   tocItems = [];
@@ -164,6 +181,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "SETTINGS_CHANGED") {
     handleSettingsChange(message.settings);
     sendResponse({ success: true });
+  } else if (message.type === "CLEAN_SCRIPT_LEAK") {
+    // 手动触发脚本泄露清理
+    detectAndCleanScriptLeak();
+    sendResponse({ success: true });
   }
 });
 
@@ -176,3 +197,31 @@ if (document.readyState === "loading") {
 
 // 处理页面卸载
 window.addEventListener("unload", cleanup);
+
+// 监听DOM变化，检测脚本泄露
+const observer = new MutationObserver((mutations) => {
+  let shouldCheck = false;
+
+  for (const mutation of mutations) {
+    if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+      // 如果添加了新节点，标记需要检查
+      shouldCheck = true;
+      break;
+    }
+  }
+
+  if (shouldCheck) {
+    detectAndCleanScriptLeak();
+  }
+});
+
+// 开始观察DOM变化
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
+
+// 确保页面卸载时断开观察器
+window.addEventListener("unload", () => {
+  observer.disconnect();
+});

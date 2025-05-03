@@ -3,6 +3,7 @@
  */
 
 import { TocItem } from "../types";
+import { safeCreateElement } from "./safeDOM";
 
 /**
  * 创建具有指定属性的HTML元素
@@ -16,29 +17,14 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
   attributes: Record<string, string> = {},
   children?: (HTMLElement | string)[] | string
 ): HTMLElementTagNameMap[K] {
-  const element = document.createElement(tag);
-
-  // 设置属性
-  Object.entries(attributes).forEach(([key, value]) => {
-    element.setAttribute(key, value);
-  });
-
-  // 添加子元素或文本
-  if (children) {
-    if (typeof children === "string") {
-      element.textContent = children;
-    } else {
-      children.forEach((child) => {
-        if (typeof child === "string") {
-          element.appendChild(document.createTextNode(child));
-        } else {
-          element.appendChild(child);
-        }
-      });
-    }
-  }
-
-  return element;
+  // 使用安全的DOM创建方法
+  return safeCreateElement(
+    tag,
+    attributes,
+    typeof children === "string"
+      ? children
+      : (children as (HTMLElement | Text)[])
+  );
 }
 
 /**
@@ -47,7 +33,11 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
  * @param classNames 要添加的类名列表
  */
 export function addClass(element: HTMLElement, ...classNames: string[]): void {
-  element.classList.add(...classNames);
+  try {
+    element.classList.add(...classNames);
+  } catch (error) {
+    console.error("添加类名失败:", error);
+  }
 }
 
 /**
@@ -59,7 +49,11 @@ export function removeClass(
   element: HTMLElement,
   ...classNames: string[]
 ): void {
-  element.classList.remove(...classNames);
+  try {
+    element.classList.remove(...classNames);
+  } catch (error) {
+    console.error("移除类名失败:", error);
+  }
 }
 
 /**
@@ -73,7 +67,11 @@ export function toggleClass(
   className: string,
   force?: boolean
 ): void {
-  element.classList.toggle(className, force);
+  try {
+    element.classList.toggle(className, force);
+  } catch (error) {
+    console.error("切换类名失败:", error);
+  }
 }
 
 /**
@@ -88,21 +86,26 @@ export function findHeadings(
   minLevel: number = 1,
   maxLevel: number = 6
 ): HTMLElement[] {
-  const selectors = Array.from(
-    { length: maxLevel - minLevel + 1 },
-    (_, i) => `h${i + minLevel}`
-  ).join(", ");
+  try {
+    const selectors = Array.from(
+      { length: maxLevel - minLevel + 1 },
+      (_, i) => `h${i + minLevel}`
+    ).join(", ");
 
-  // 获取所有标题元素
-  const headings = Array.from(container.querySelectorAll(selectors));
+    // 获取所有标题元素
+    const headings = Array.from(container.querySelectorAll(selectors));
 
-  // 过滤掉空白的标题元素
-  return headings.filter((heading) => {
-    // 获取文本内容并去除空格
-    const text = heading.textContent?.trim() || "";
-    // 检查标题是否有实际内容
-    return text.length > 0;
-  }) as HTMLElement[];
+    // 过滤掉空白的标题元素
+    return headings.filter((heading) => {
+      // 获取文本内容并去除空格
+      const text = heading.textContent?.trim() || "";
+      // 检查标题是否有实际内容
+      return text.length > 0;
+    }) as HTMLElement[];
+  } catch (error) {
+    console.error("查找标题元素失败:", error);
+    return [];
+  }
 }
 
 /**
@@ -122,13 +125,23 @@ export function scrollToElement(
   element: HTMLElement,
   offset: number = 0
 ): void {
-  const rect = element.getBoundingClientRect();
-  const top = rect.top + window.pageYOffset - offset;
+  try {
+    const rect = element.getBoundingClientRect();
+    const top = rect.top + window.pageYOffset - offset;
 
-  window.scrollTo({
-    top,
-    behavior: "smooth",
-  });
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
+  } catch (error) {
+    console.error("滚动到元素失败:", error);
+    // 回退到简单滚动
+    try {
+      window.scrollTo(0, element.offsetTop - offset);
+    } catch (e) {
+      // 忽略次要错误
+    }
+  }
 }
 
 /**
@@ -137,15 +150,21 @@ export function scrollToElement(
  * @returns 文本内容
  */
 export function getElementText(element: HTMLElement): string {
-  // 创建一个文档片段来复制元素
-  const clone = element.cloneNode(true) as HTMLElement;
+  try {
+    // 创建一个文档片段来复制元素
+    const clone = element.cloneNode(true) as HTMLElement;
 
-  // 移除所有脚本和样式标签
-  const scriptsAndStyles = clone.querySelectorAll("script, style");
-  scriptsAndStyles.forEach((node) => node.remove());
+    // 移除所有脚本和样式标签
+    const scriptsAndStyles = clone.querySelectorAll("script, style");
+    scriptsAndStyles.forEach((node) => node.remove());
 
-  // 获取文本内容
-  return clone.textContent?.trim() || "";
+    // 获取文本内容
+    return clone.textContent?.trim() || "";
+  } catch (error) {
+    console.error("获取元素文本失败:", error);
+    // 回退到直接获取文本
+    return element.textContent?.trim() || "";
+  }
 }
 
 /**
