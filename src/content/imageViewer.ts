@@ -14,6 +14,8 @@ let clickEventBound = false;
 let isInCooldown = false;
 // 缓存已加载的图片URL
 const preloadedImages = new Set<string>();
+// 添加一个变量来记录上次查看的图片元素
+let lastViewedImage: HTMLImageElement | null = null;
 
 /**
  * 创建图片查看器
@@ -248,11 +250,6 @@ function preloadArticleImages() {
  */
 function handleImageClick(e: MouseEvent): void {
   try {
-    // 如果查看器正在显示或处于冷却状态，不处理点击
-    if (isVisible || isInCooldown) {
-      return;
-    }
-
     const target = e.target as HTMLElement;
 
     // 检查点击的是否是文章中的图片
@@ -267,10 +264,27 @@ function handleImageClick(e: MouseEvent): void {
       e.preventDefault();
       e.stopPropagation();
 
+      // 如果查看器正在显示，不处理点击
+      if (isVisible) {
+        return;
+      }
+
+      // 如果处于冷却状态，但点击的是不同的图片，则允许点击
+      if (isInCooldown && target !== lastViewedImage) {
+        console.log("检测到新图片点击，跳过冷却时间");
+        isInCooldown = false;
+      } else if (isInCooldown) {
+        // 如果是同一张图片且在冷却中，不处理
+        return;
+      }
+
       // 获取高清图片URL
       const originalSrc = getOriginalImageUrl(target as HTMLImageElement);
       if (originalSrc) {
         console.log("显示图片:", originalSrc);
+
+        // 记录当前查看的图片元素
+        lastViewedImage = target as HTMLImageElement;
 
         // 使用requestAnimationFrame确保在下一帧渲染前显示图片，减少闪烁
         requestAnimationFrame(() => {
@@ -320,6 +334,14 @@ function showImageViewer(imageUrl: string): void {
     // 如果图片已经预加载过，可以更快地显示
     const isPreloaded = preloadedImages.has(imageUrl);
 
+    // 防止滚动条消失引起的页面偏移
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      // 添加一个与滚动条等宽的padding，防止页面偏移
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
     // 阻止背景滚动 - 确保在设置图片前就锁定滚动，避免页面跳动
     document.body.style.overflow = "hidden";
 
@@ -359,6 +381,7 @@ function hideImageViewer(): void {
     console.warn("图片查看器不存在");
     // 确保即使查看器不存在，也恢复滚动
     document.body.style.overflow = "";
+    document.body.style.paddingRight = ""; // 恢复padding
     return;
   }
 
@@ -370,8 +393,9 @@ function hideImageViewer(): void {
     imageViewer.classList.remove("wechat-image-viewer-active");
     isVisible = false;
 
-    // 恢复背景滚动
+    // 恢复背景滚动和padding
     document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
 
     // 使用requestAnimationFrame确保在下一帧时处理图片，减少闪烁
     requestAnimationFrame(() => {
@@ -385,16 +409,16 @@ function hideImageViewer(): void {
               "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
           }
 
-          // 冷却结束
+          // 冷却结束 - 从300ms减少到50ms
           setTimeout(() => {
             isInCooldown = false;
-          }, 300);
+          }, 10);
         }, 300); // 等待过渡动画完成
       } else {
-        // 如果没有图片元素，也需要结束冷却
+        // 如果没有图片元素，也需要结束冷却 - 从300ms减少到50ms
         setTimeout(() => {
           isInCooldown = false;
-        }, 300);
+        }, 50);
       }
     });
 
@@ -412,7 +436,9 @@ function hideImageViewer(): void {
 function resetViewerState(): void {
   isVisible = false;
   isInCooldown = false;
+  lastViewedImage = null;
   document.body.style.overflow = "";
+  document.body.style.paddingRight = ""; // 恢复padding
 }
 
 /**
@@ -436,17 +462,20 @@ export function destroyImageViewer(): void {
     imageElement = null;
     isVisible = false;
     isInCooldown = false;
+    lastViewedImage = null;
 
     // 清空预加载图片集合
     preloadedImages.clear();
 
-    // 确保页面可以滚动
+    // 确保页面可以滚动，并恢复padding
     document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
 
     console.log("图片查看器已销毁");
   } catch (error) {
     console.error("销毁图片查看器失败:", error);
-    // 确保即使出错，也恢复滚动
+    // 确保即使出错，也恢复滚动和padding
     document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
   }
 }
