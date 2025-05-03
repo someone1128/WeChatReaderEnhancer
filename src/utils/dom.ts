@@ -2,7 +2,7 @@
  * DOM操作工具函数
  */
 
-import { TocItem } from '../types';
+import { TocItem } from "../types";
 
 /**
  * 创建具有指定属性的HTML元素
@@ -25,11 +25,11 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 
   // 添加子元素或文本
   if (children) {
-    if (typeof children === 'string') {
+    if (typeof children === "string") {
       element.textContent = children;
     } else {
-      children.forEach(child => {
-        if (typeof child === 'string') {
+      children.forEach((child) => {
+        if (typeof child === "string") {
           element.appendChild(document.createTextNode(child));
         } else {
           element.appendChild(child);
@@ -55,7 +55,10 @@ export function addClass(element: HTMLElement, ...classNames: string[]): void {
  * @param element HTML元素
  * @param classNames 要移除的类名列表
  */
-export function removeClass(element: HTMLElement, ...classNames: string[]): void {
+export function removeClass(
+  element: HTMLElement,
+  ...classNames: string[]
+): void {
   element.classList.remove(...classNames);
 }
 
@@ -65,7 +68,11 @@ export function removeClass(element: HTMLElement, ...classNames: string[]): void
  * @param className 要切换的类名
  * @param force 强制添加或移除
  */
-export function toggleClass(element: HTMLElement, className: string, force?: boolean): void {
+export function toggleClass(
+  element: HTMLElement,
+  className: string,
+  force?: boolean
+): void {
   element.classList.toggle(className, force);
 }
 
@@ -84,9 +91,18 @@ export function findHeadings(
   const selectors = Array.from(
     { length: maxLevel - minLevel + 1 },
     (_, i) => `h${i + minLevel}`
-  ).join(', ');
+  ).join(", ");
 
-  return Array.from(container.querySelectorAll(selectors));
+  // 获取所有标题元素
+  const headings = Array.from(container.querySelectorAll(selectors));
+
+  // 过滤掉空白的标题元素
+  return headings.filter((heading) => {
+    // 获取文本内容并去除空格
+    const text = heading.textContent?.trim() || "";
+    // 检查标题是否有实际内容
+    return text.length > 0;
+  }) as HTMLElement[];
 }
 
 /**
@@ -102,13 +118,16 @@ export function generateId(): string {
  * @param element 目标元素
  * @param offset 偏移量
  */
-export function scrollToElement(element: HTMLElement, offset: number = 0): void {
+export function scrollToElement(
+  element: HTMLElement,
+  offset: number = 0
+): void {
   const rect = element.getBoundingClientRect();
   const top = rect.top + window.pageYOffset - offset;
-  
+
   window.scrollTo({
     top,
-    behavior: 'smooth'
+    behavior: "smooth",
   });
 }
 
@@ -120,13 +139,13 @@ export function scrollToElement(element: HTMLElement, offset: number = 0): void 
 export function getElementText(element: HTMLElement): string {
   // 创建一个文档片段来复制元素
   const clone = element.cloneNode(true) as HTMLElement;
-  
+
   // 移除所有脚本和样式标签
-  const scriptsAndStyles = clone.querySelectorAll('script, style');
-  scriptsAndStyles.forEach(node => node.remove());
-  
+  const scriptsAndStyles = clone.querySelectorAll("script, style");
+  scriptsAndStyles.forEach((node) => node.remove());
+
   // 获取文本内容
-  return clone.textContent?.trim() || '';
+  return clone.textContent?.trim() || "";
 }
 
 /**
@@ -140,13 +159,13 @@ export function throttle<T extends (...args: any[]) => any>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let lastCall = 0;
-  
-  return function(this: any, ...args: Parameters<T>) {
+
+  return function (this: any, ...args: Parameters<T>) {
     const now = Date.now();
-    
+
     if (now - lastCall >= delay) {
       lastCall = now;
       fn.apply(this, args);
     }
   };
-} 
+}

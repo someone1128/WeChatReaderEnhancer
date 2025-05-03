@@ -20,25 +20,33 @@ export function buildTocTree(headings: HTMLElement[]): TocItem[] {
     return posA - posB;
   });
 
-  // 为每个标题创建基础目录项
-  const items: TocItem[] = headings.map((heading) => {
+  // 为每个标题创建基础目录项，同时过滤掉空标题
+  let items: TocItem[] = [];
+
+  for (const heading of headings) {
     // 获取标题级别
     const level = parseInt(heading.tagName.substring(1), 10);
+
+    // 获取标题文本
+    const text = getElementText(heading);
+
+    // 如果标题为空，跳过此标题
+    if (!text) continue;
 
     // 为标题元素添加ID（如果没有）
     if (!heading.id) {
       heading.id = generateId();
     }
 
-    return {
+    items.push({
       id: heading.id,
       level,
-      text: getElementText(heading),
+      text,
       element: heading,
       children: [],
       isExpanded: true,
-    };
-  });
+    });
+  }
 
   // 构建树结构
   const root: TocItem[] = [];

@@ -18,6 +18,18 @@
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
+/* 阅读进度指示器 */
+.wechat-toc-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 0%;
+  background-color: #1E88E5;
+  transition: height 0.3s ease;
+  z-index: 10001;
+}
+
 /* 最小化状态 */
 .wechat-toc-container.wechat-toc-minimized {
   width: 32px !important;
@@ -34,6 +46,9 @@
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* 目录标题 */
@@ -113,6 +128,12 @@
   margin-top: 60px;
   letter-spacing: 4px;
   font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.wechat-toc-vertical-text:hover {
+  color: #1E88E5;
 }
 
 .wechat-toc-minimized .wechat-toc-vertical-text {
@@ -152,6 +173,33 @@
 .wechat-toc-link:hover {
   color: #1E88E5;
   background-color: #F5F9FF;
+}
+
+/* 目录项悬停预览 */
+.wechat-toc-preview {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  width: 300px;
+  background: white;
+  border: 1px solid #EAEAEA;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #333;
+  z-index: 10002;
+  display: none;
+  max-height: 200px;
+  overflow: hidden;
+  line-height: 1.6;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  margin-left: 8px;
+}
+
+.wechat-toc-item:hover .wechat-toc-preview {
+  display: block;
 }
 
 /* 目录项层级样式 */
@@ -281,6 +329,10 @@
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
   }
+  
+  .wechat-toc-preview {
+    display: none !important; /* 小屏幕上禁用预览 */
+  }
 }
 
 /* 暗色模式支持 */
@@ -327,6 +379,17 @@
   
   .wechat-toc-toggle:hover {
     color: #64B5F6;
+  }
+  
+  .wechat-toc-progress-bar {
+    background-color: #64B5F6;
+  }
+  
+  .wechat-toc-preview {
+    background-color: #2D2D2D;
+    border-color: #3D3D3D;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    color: #E0E0E0;
   }
   
   .wechat-toc-list::-webkit-scrollbar-thumb {
