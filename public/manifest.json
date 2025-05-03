@@ -1,0 +1,41 @@
+{
+    "manifest_version": 3,
+    "name": "公众号阅读增强器",
+    "description": "为微信公众号文章生成结构化目录，提升阅读体验",
+    "version": "1.0.0",
+    "permissions": [
+        "storage"
+    ],
+    "host_permissions": [
+        "https://mp.weixin.qq.com/*"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://mp.weixin.qq.com/s*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "toc.css"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    }
+}

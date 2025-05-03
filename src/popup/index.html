@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公众号阅读增强插件</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
+      width: 320px;
+      color: #333;
+    }
+
+    header {
+      background-color: #1E88E5;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      border-bottom: 1px solid #1976D2;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: white;
+    }
+
+    .range-control {
+      display: flex;
+      align-items: center;
+    }
+
+    .range-control input[type="number"] {
+      margin: 0 8px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #1E88E5;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+      gap: 8px;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+
+    .primary {
+      background-color: #1E88E5;
+      color: white;
+    }
+
+    .primary:hover {
+      background-color: #1976D2;
+    }
+
+    .secondary {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+
+    .secondary:hover {
+      background-color: #d0d0d0;
+    }
+
+    .info {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+
+    .info a {
+      color: #1E88E5;
+      text-decoration: none;
+    }
+
+    .info a:hover {
+      text-decoration: underline;
+    }
+    
+    /* 暗黑模式支持 */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #292929;
+        color: #e0e0e0;
+      }
+      
+      header {
+        background-color: #1565C0;
+        border-bottom-color: #0D47A1;
+      }
+      
+      input[type="number"], select {
+        background-color: #3d3d3d;
+        border-color: #555;
+        color: #e0e0e0;
+      }
+      
+      .secondary {
+        background-color: #3d3d3d;
+        color: #e0e0e0;
+      }
+      
+      .secondary:hover {
+        background-color: #4d4d4d;
+      }
+      
+      .info {
+        color: #aaa;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>公众号阅读增强插件</h1>
+  </header>
+  
+  <div class="container">
+    <div class="form-group flex-between">
+      <label for="isEnabled">启用插件</label>
+      <div class="switch">
+        <input type="checkbox" id="isEnabled" checked title="启用或禁用插件" aria-label="启用插件">
+        <span class="slider"></span>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="tocWidthRange">目录宽度</label>
+      <div class="range-control">
+        <input type="range" id="tocWidthRange" min="200" max="400" step="10" value="280" aria-labelledby="tocWidthLabel">
+        <input type="number" id="tocWidth" min="200" max="400" value="280" aria-label="目录宽度数值" title="目录宽度数值">
+        <span>px</span>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>标题层级范围</label>
+      <div class="flex-between">
+        <div>
+          <label for="minLevel">最小</label>
+          <select id="minLevel" title="最小标题级别">
+            <option value="1">H1</option>
+            <option value="2">H2</option>
+            <option value="3">H3</option>
+          </select>
+        </div>
+        <div>
+          <label for="maxLevel">最大</label>
+          <select id="maxLevel" title="最大标题级别">
+            <option value="3">H3</option>
+            <option value="4">H4</option>
+            <option value="5">H5</option>
+            <option value="6" selected>H6</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="autoExpand">
+        <input type="checkbox" id="autoExpand" checked>
+        自动展开目录
+      </label>
+    </div>
+    
+    <div class="buttons">
+      <button class="secondary" id="resetButton">恢复默认</button>
+      <button class="primary" id="saveButton">保存设置</button>
+    </div>
+    
+    <div class="info">
+      版本 1.0.0 | <a href="https://github.com/username/wechat-reader-enhancer" target="_blank" rel="noopener noreferrer">帮助 & 反馈</a>
+    </div>
+  </div>
+</body>
+</html> 

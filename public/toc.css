@@ -1,0 +1,339 @@
+/**
+ * 公众号阅读增强插件 - 目录样式
+ */
+
+/* 目录容器 */
+.wechat-toc-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 280px;
+  background-color: #FFFFFF;
+  border-right: 1px solid #E0E0E0;
+  z-index: 10000;
+  transition: width 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+/* 最小化状态 */
+.wechat-toc-container.wechat-toc-minimized {
+  width: 32px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 标题栏 */
+.wechat-toc-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #EAEAEA;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* 目录标题 */
+.wechat-toc-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 目录内容区域 */
+.wechat-toc-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+/* 控制按钮 */
+.wechat-toc-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.wechat-toc-button:hover {
+  color: #1E88E5;
+}
+
+/* 最小化按钮 */
+.wechat-toc-minimize {
+  display: block;
+}
+
+.wechat-toc-minimized .wechat-toc-minimize {
+  display: none;
+}
+
+/* 展开按钮 */
+.wechat-toc-expand {
+  display: none;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px;
+  font-size: 18px;
+}
+
+.wechat-toc-minimized .wechat-toc-expand {
+  display: block;
+}
+
+/* 收起状态下显示的竖向文字 */
+.wechat-toc-vertical-text {
+  display: none;
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #666666;
+  margin-top: 60px;
+  letter-spacing: 4px;
+  font-weight: 500;
+}
+
+.wechat-toc-minimized .wechat-toc-vertical-text {
+  display: block;
+}
+
+/* 目录列表样式 */
+.wechat-toc-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.wechat-toc-item {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  width: 100%;
+}
+
+/* 目录链接样式 */
+.wechat-toc-link {
+  display: block;
+  padding: 6px 16px 6px 16px;
+  text-decoration: none;
+  color: #333333;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+  transition: color 0.2s, background-color 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wechat-toc-link:hover {
+  color: #1E88E5;
+  background-color: #F5F9FF;
+}
+
+/* 目录项层级样式 */
+.wechat-toc-level-1 > .wechat-toc-link {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.wechat-toc-level-2 > .wechat-toc-link {
+  font-weight: 600;
+  font-size: 15px;
+  padding-left: 32px;
+}
+
+.wechat-toc-level-3 > .wechat-toc-link {
+  font-weight: normal;
+  font-size: 14px;
+  padding-left: 48px;
+}
+
+.wechat-toc-level-4 > .wechat-toc-link {
+  font-size: 13px;
+  padding-left: 64px;
+}
+
+.wechat-toc-level-5 > .wechat-toc-link {
+  font-size: 13px;
+  padding-left: 80px;
+}
+
+.wechat-toc-level-6 > .wechat-toc-link {
+  font-size: 13px;
+  padding-left: 96px;
+}
+
+/* 当前活跃项样式 */
+.wechat-toc-active > .wechat-toc-link {
+  color: #1E88E5;
+  background-color: #E3F2FD;
+  border-left: 3px solid #1E88E5;
+  font-weight: 600;
+}
+
+/* 折叠/展开图标 */
+.wechat-toc-toggle {
+  position: absolute;
+  top: 8px;
+  left: 4px;
+  color: #666666;
+  cursor: pointer;
+  font-size: 10px;
+  z-index: 1;
+  transition: color 0.2s;
+}
+
+.wechat-toc-toggle:hover {
+  color: #1E88E5;
+}
+
+.wechat-toc-level-2 .wechat-toc-toggle {
+  left: 20px;
+}
+
+.wechat-toc-level-3 .wechat-toc-toggle {
+  left: 36px;
+}
+
+.wechat-toc-level-4 .wechat-toc-toggle {
+  left: 52px;
+}
+
+.wechat-toc-level-5 .wechat-toc-toggle {
+  left: 68px;
+}
+
+.wechat-toc-level-6 .wechat-toc-toggle {
+  left: 84px;
+}
+
+/* 隐藏的元素 */
+.wechat-toc-hidden {
+  display: none;
+}
+
+/* 最小化状态下隐藏内容 */
+.wechat-toc-minimized .wechat-toc-title,
+.wechat-toc-minimized .wechat-toc-list,
+.wechat-toc-minimized .wechat-toc-children {
+  display: none;
+}
+
+/* 子目录容器样式调整，减少空白 */
+.wechat-toc-children {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* 目录列表层级样式 */
+.wechat-toc-list-level-0 {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 滚动条样式 */
+.wechat-toc-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wechat-toc-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wechat-toc-list::-webkit-scrollbar-thumb {
+  background-color: #CCCCCC;
+  border-radius: 3px;
+}
+
+.wechat-toc-list::-webkit-scrollbar-thumb:hover {
+  background-color: #AAAAAA;
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 768px) {
+  .wechat-toc-container:not(.wechat-toc-minimized) {
+    background-color: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+  }
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .wechat-toc-container {
+    background-color: #2D2D2D;
+    border-right: 1px solid #444444;
+  }
+  
+  .wechat-toc-header {
+    border-bottom-color: #3D3D3D;
+  }
+  
+  .wechat-toc-title {
+    color: #E0E0E0;
+  }
+  
+  .wechat-toc-button {
+    color: #A0A0A0;
+  }
+
+  .wechat-toc-vertical-text {
+    color: #A0A0A0;
+  }
+  
+  .wechat-toc-link {
+    color: #E0E0E0;
+  }
+  
+  .wechat-toc-link:hover {
+    background-color: #3D3D3D;
+    color: #64B5F6;
+  }
+  
+  .wechat-toc-active > .wechat-toc-link {
+    background-color: #0D47A1;
+    color: #FFFFFF;
+    border-left-color: #90CAF9;
+  }
+  
+  .wechat-toc-toggle {
+    color: #A0A0A0;
+  }
+  
+  .wechat-toc-toggle:hover {
+    color: #64B5F6;
+  }
+  
+  .wechat-toc-list::-webkit-scrollbar-thumb {
+    background-color: #4D4D4D;
+  }
+  
+  .wechat-toc-list::-webkit-scrollbar-thumb:hover {
+    background-color: #5D5D5D;
+  }
+} 
