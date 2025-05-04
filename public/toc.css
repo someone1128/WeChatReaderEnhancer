@@ -408,9 +408,9 @@
 }
 
 .wechat-toc-footer {
-  padding: 10px 16px;
-  border-top: 1px solid #eee;
-  background-color: #f9f9f9;
+  padding: 6px 16px;
+  border-top: none;
+  background-color: transparent;
   flex-shrink: 0;
   position: sticky;
   bottom: 0;
@@ -425,7 +425,7 @@
 
 .wechat-toc-footer-link {
   display: inline-block;
-  opacity: 0.7;
+  opacity: 0.6;
   transition: opacity 0.2s ease;
 }
 
@@ -434,8 +434,8 @@
 }
 
 .wechat-toc-footer-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   vertical-align: middle;
 }
 

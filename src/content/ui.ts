@@ -457,17 +457,17 @@ function createFooter(): HTMLElement {
     {
       name: "即刻",
       url: "https://web.okjike.com/u/ec41d7d5-407d-4395-ac8a-bd0f04fb202c",
-      icon: "即刻.png",
+      icon: "jike.png",
     },
     {
       name: "哔哩哔哩",
       url: "https://space.bilibili.com/444418069",
-      icon: "哔哩哔哩.png",
+      icon: "blibli.png",
     },
     {
       name: "小红书",
       url: "https://www.xiaohongshu.com/user/profile/63eccfa2000000002600707d",
-      icon: "小红书.png",
+      icon: "xhs.png",
     },
   ];
 

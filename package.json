@@ -9,7 +9,7 @@
         "test": "jest",
         "lint": "eslint src --ext .ts",
         "format": "prettier --write \"src/**/*.{ts,tsx,css,html}\"",
-        "zip": "npm run build && powershell -Command \"Compress-Archive -Path dist\\* -DestinationPath dist.zip\""
+        "zip": "npm run build && powershell -Command \"Compress-Archive -Path dist\\* -DestinationPath dist.zip -Force\""
     },
     "repository": {
         "type": "git",

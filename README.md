@@ -1,7 +1,11 @@
-# 公众号阅读增强插件 (WeChat Reader Enhancer)
+<h1 align="center">公众号阅读增强插件 (WeChat Reader Enhancer)</h1>
 
-![版本](https://img.shields.io/badge/版本-1.0.0-blue)
-![许可证](https://img.shields.io/badge/许可证-MIT-green)
+<p align="center">
+  <a href="https://web.okjike.com/u/ec41d7d5-407d-4395-ac8a-bd0f04fb202c" target="_blank"><img src="https://img.shields.io/badge/即刻-Jike-yellow" alt="即刻"></a>
+  <a href="https://x.com/huangzh65903362" target="_blank"><img src="https://img.shields.io/badge/Twitter-X-black" alt="推特X"></a>
+  <a href="https://space.bilibili.com/444418069" target="_blank"><img src="https://img.shields.io/badge/Bilibili-哔哩哔哩-pink" alt="哔哩哔哩"></a>
+  <a href="https://www.xiaohongshu.com/user/profile/63eccfa2000000002600707d" target="_blank"><img src="https://img.shields.io/badge/小红书-Xiaohongshu-red" alt="小红书"></a>
+</p>
 
 ## 📖 项目简介
 
@@ -14,7 +18,9 @@
 - **阅读位置追踪**：滚动文章时，目录中自动高亮当前阅读位置
 - **界面定制优化**：精心设计的UI，不影响原文阅读体验
 
-![插件预览](docs/images/preview.png)
+![目录结构化](./docs/image/1.png)
+
+![图片放大预览](./docs/image/2.png)
 
 ## ✨ 功能详解
 
@@ -40,6 +46,12 @@
 1. 访问[Chrome 网上应用店](https://chrome.google.com/webstore/category/extensions)
 2. 搜索"公众号阅读增强插件"
 3. 点击"添加到 Chrome"按钮
+
+### 从 Microsoft Edge 加载项商店安装
+
+1. 访问[Microsoft Edge 加载项商店](https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home) (链接待插件审核通过后更新)
+2. 搜索"公众号阅读增强插件"
+3. 点击"获取"按钮
 
 ### 开发者安装
 
@@ -155,6 +167,11 @@ A: 插件经过性能优化，对页面加载速度影响极小。它仅在页�
 
 - 项目仓库: [GitHub](https://github.com/username/WeChatReaderEnhancer)
 - 问题反馈: [Issues](https://github.com/username/WeChatReaderEnhancer/issues)
+- 关注开发者:
+  - [即刻](https://web.okjike.com/u/ec41d7d5-407d-4395-ac8a-bd0f04fb202c)
+  - [推特X](https://x.com/huangzh65903362)
+  - [哔哩哔哩](https://space.bilibili.com/444418069)
+  - [小红书](https://www.xiaohongshu.com/user/profile/63eccfa2000000002600707d)
 
 ## 🙏 鸣谢
 
