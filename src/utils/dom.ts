@@ -95,12 +95,19 @@ export function findHeadings(
     // 获取所有标题元素
     const headings = Array.from(container.querySelectorAll(selectors));
 
-    // 过滤掉空白的标题元素
+    // 过滤掉空白的标题元素和嵌套在列表项中的标题
     return headings.filter((heading) => {
       // 获取文本内容并去除空格
       const text = heading.textContent?.trim() || "";
+
       // 检查标题是否有实际内容
-      return text.length > 0;
+      const hasContent = text.length > 0;
+
+      // 检查标题是否嵌套在列表项中
+      const isNestedInListItem = !!heading.closest("li");
+
+      // 只保留有内容且不在列表项中的标题
+      return hasContent && !isNestedInListItem;
     }) as HTMLElement[];
   } catch (error) {
     console.error("查找标题元素失败:", error);

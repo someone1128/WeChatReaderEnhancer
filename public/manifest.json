@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "公众号阅读增强器",
     "description": "为微信公众号文章提供结构化目录导航和图片查看增强，全面提升阅读体验",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "permissions": [
         "storage"
     ],
