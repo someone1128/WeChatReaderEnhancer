@@ -58,8 +58,8 @@ export function initImageViewer(): void {
     // 处理当前页面上的图片
     processArticleImages();
 
-    // 初始化medium-zoom，针对微信公众号文章中的图片
-    zoom = mediumZoom("img.rich_pages, img.wxw-img", {
+    // 初始化medium-zoom，针对id="img-content"下的所有图片
+    zoom = mediumZoom("#img-content img", {
       background: "rgba(0, 0, 0, 0.85)",
       margin: 40,
       scrollOffset: 0,
@@ -79,9 +79,9 @@ export function initImageViewer(): void {
  */
 function processArticleImages(): void {
   try {
-    // 查找微信公众号文章中的图片
+    // 查找id="img-content"下的所有图片
     const articleImages = document.querySelectorAll(
-      "img.rich_pages, img.wxw-img"
+      "#img-content img"
     ) as NodeListOf<HTMLImageElement>;
 
     // 使用requestIdleCallback或setTimeout分批处理图片，避免阻塞主线程
