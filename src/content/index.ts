@@ -58,8 +58,17 @@ async function init(): Promise<void> {
     const articleContainer = findArticleContainer();
     if (!articleContainer) {
       console.warn("未找到文章容器");
+
+      // 即使未找到文章容器，也初始化图片查看器
+      initImageViewer();
+
+      // 标记为已初始化
+      isInitialized = true;
       return;
     }
+
+    // 初始化图片查看器（无论是否有标题元素都初始化）
+    initImageViewer();
 
     // 识别文章中的标题
     const headingElements = findHeadings(
@@ -70,6 +79,9 @@ async function init(): Promise<void> {
 
     if (headingElements.length === 0) {
       console.warn("未找到标题元素");
+
+      // 即使没有标题元素，插件也已经初始化了图片查看器
+      isInitialized = true;
       return;
     }
 
@@ -77,6 +89,9 @@ async function init(): Promise<void> {
     tocItems = buildTocTree(headingElements);
     if (tocItems.length === 0) {
       console.warn("生成目录树失败");
+
+      // 即使目录树生成失败，插件也已经初始化了图片查看器
+      isInitialized = true;
       return;
     }
 
@@ -93,6 +108,9 @@ async function init(): Promise<void> {
     const tocList = getTocList();
     if (!tocList) {
       console.warn("目录列表元素不可用");
+
+      // 即使目录列表不可用，插件也已经初始化了图片查看器
+      isInitialized = true;
       return;
     }
 
@@ -104,9 +122,6 @@ async function init(): Promise<void> {
 
     // 初始化滚动监听
     initScrollObserver(tocItems);
-
-    // 初始化图片查看器
-    initImageViewer();
 
     // 设置定期检查脚本泄露
     setInterval(detectAndCleanScriptLeak, 5000);

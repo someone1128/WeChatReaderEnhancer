@@ -39,6 +39,7 @@ Chrome/Edge商店搜索"公众号阅读增强插件"即可安装
 
 官网：https://wxreader.example.com
 开源地址：https://github.com/username/WeChatReaderEnhancer
+哔哩哔哩视频演示：https://www.bilibili.com/video/BV1D1VPzLEmn/
 
 欢迎尝试使用，有任何问题或建议都可以告诉我！
 ```
