@@ -15,6 +15,7 @@ import {
 } from "./ui";
 import { initScrollObserver, destroyScrollObserver } from "./observer";
 import { initImageViewer, destroyImageViewer } from "./imageViewer";
+import { initLinkifier, destroyLinkifier } from "./linkifier";
 import { detectAndCleanScriptLeak } from "../utils/safeDOM";
 
 // 全局变量
@@ -53,6 +54,9 @@ async function init(): Promise<void> {
 
     // 再次检测并清理可能的脚本泄露（页面完全加载后）
     detectAndCleanScriptLeak();
+
+    // 初始化链接识别器
+    initLinkifier();
 
     // 查找文章容器
     const articleContainer = findArticleContainer();
@@ -104,34 +108,24 @@ async function init(): Promise<void> {
     // 将目录容器添加到页面
     document.body.appendChild(tocContainer);
 
-    // 确保tocList可用
+    // 渲染目录树
     const tocList = getTocList();
-    if (!tocList) {
-      console.warn("目录列表元素不可用");
-
-      // 即使目录列表不可用，插件也已经初始化了图片查看器
-      isInitialized = true;
-      return;
+    if (tocList) {
+      renderTocTree(tocItems, tocList);
     }
 
-    // 渲染目录树到tocList
-    renderTocTree(tocItems, tocList);
-
-    // 恢复面板状态（展开/折叠）
+    // 恢复目录面板状态
     restorePanelState();
 
     // 初始化滚动监听
     initScrollObserver(tocItems);
-
-    // 设置定期检查脚本泄露
-    setInterval(detectAndCleanScriptLeak, 5000);
 
     // 标记为已初始化
     isInitialized = true;
 
     console.log("公众号阅读增强插件初始化完成");
   } catch (error) {
-    console.error("公众号阅读增强插件初始化失败:", error);
+    console.error("插件初始化失败:", error);
   }
 }
 
@@ -139,23 +133,31 @@ async function init(): Promise<void> {
  * 清理插件
  */
 function cleanup(): void {
-  // 移除目录容器
-  const tocContainer = getTocContainer();
-  if (tocContainer && tocContainer.parentNode) {
-    tocContainer.parentNode.removeChild(tocContainer);
+  try {
+    console.log("清理公众号阅读增强插件...");
+
+    // 移除目录容器
+    const tocContainer = getTocContainer();
+    if (tocContainer && tocContainer.parentNode) {
+      tocContainer.parentNode.removeChild(tocContainer);
+    }
+
+    // 销毁滚动监听器
+    destroyScrollObserver();
+
+    // 销毁图片查看器
+    destroyImageViewer();
+
+    // 销毁链接识别器
+    destroyLinkifier();
+
+    // 重置初始化标记
+    isInitialized = false;
+
+    console.log("公众号阅读增强插件已清理");
+  } catch (error) {
+    console.error("插件清理失败:", error);
   }
-
-  // 销毁滚动监听器
-  destroyScrollObserver();
-
-  // 销毁图片查看器
-  destroyImageViewer();
-
-  // 重置状态
-  tocItems = [];
-  isInitialized = false;
-
-  console.log("公众号阅读增强插件已清理");
 }
 
 /**
@@ -280,3 +282,6 @@ observer.observe(document.body, {
 window.addEventListener("unload", () => {
   observer.disconnect();
 });
+
+// 导出供外部调用
+export { init, cleanup };

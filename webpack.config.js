@@ -33,6 +33,7 @@ module.exports = {
         { from: "public/logo", to: "logo" },
         { from: "public/toc.css", to: "toc.css" },
         { from: "src/styles/imageViewer.css", to: "imageViewer.css" },
+        { from: "src/styles/linkifier.css", to: "linkifier.css" },
         { from: "public/images", to: "images", noErrorOnMissing: true },
       ],
     }),

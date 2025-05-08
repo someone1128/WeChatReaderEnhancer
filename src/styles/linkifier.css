@@ -1,0 +1,29 @@
+/**
+ * 链接识别与转换样式 - 提高优先级
+ */
+
+/* 使用更特异的选择器确保优先级 */
+html body #js_content a.linkified,
+html body .rich_media_content a.linkified {
+  color: #07c160 !important; /* 微信绿色 */
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+  word-break: break-all !important; /* 确保长URL能够正确换行 */
+  cursor: pointer !important; /* 显示手形光标表示可点击 */
+  border-bottom: none !important; /* 默认无边框 */
+  padding-bottom: 1px !important;
+  display: inline-block !important;
+}
+
+/* 鼠标悬停时显示边框 */
+html body #js_content a.linkified:hover,
+html body .rich_media_content a.linkified:hover {
+  color: #09a052 !important; /* 微信绿色的暗色版 */
+  border-bottom: 1px solid currentColor !important; /* 使用底部边框代替下划线 */
+}
+
+/* 已访问链接样式 */
+html body #js_content a.linkified:visited,
+html body .rich_media_content a.linkified:visited {
+  color: #529b76 !important; /* 微信绿色的较淡版本 */
+}

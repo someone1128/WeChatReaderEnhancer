@@ -31,6 +31,8 @@
     "devDependencies": {
         "@types/chrome": "^0.0.246",
         "@types/jest": "^29.5.5",
+        "@types/linkify-it": "^5.0.0",
+        "@types/tlds": "^1.207.0",
         "@typescript-eslint/eslint-plugin": "^6.7.3",
         "@typescript-eslint/parser": "^6.7.3",
         "copy-webpack-plugin": "^11.0.0",
@@ -47,6 +49,9 @@
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
-        "medium-zoom": "^1.1.0"
+        "linkify-it": "^5.0.0",
+        "linkifyjs": "^4.3.1",
+        "medium-zoom": "^1.1.0",
+        "tlds": "^1.258.0"
     }
 }

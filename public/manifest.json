@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "公众号阅读增强器",
-    "description": "为微信公众号文章提供结构化目录导航和图片查看增强，全面提升阅读体验",
-    "version": "1.0.3",
+    "description": "为微信公众号文章提供结构化目录导航、图片查看增强和链接识别转换，全面提升阅读体验",
+    "version": "1.0.5",
     "permissions": [
         "storage"
     ],
@@ -28,7 +28,8 @@
             ],
             "css": [
                 "toc.css",
-                "imageViewer.css"
+                "imageViewer.css",
+                "linkifier.css"
             ],
             "run_at": "document_idle"
         }
@@ -39,6 +40,7 @@
                 "icons/*",
                 "toc.css",
                 "imageViewer.css",
+                "linkifier.css",
                 "logo/*",
                 "images/*"
             ],

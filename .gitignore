@@ -1,3 +1,4 @@
 # 项目排除路径
 /dist/
 .idea
+/node_modules
