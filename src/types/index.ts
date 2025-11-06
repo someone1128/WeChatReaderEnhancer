@@ -18,6 +18,8 @@ export interface Settings {
   minLevel: number; // 识别的最小标题级别
   maxLevel: number; // 识别的最大标题级别
   isEnabled: boolean; // 插件是否启用
+  contentMaxWidth?: number; // 文章容器最大宽度（px）
+  hideBottomBar?: boolean; // 是否隐藏底部栏
 }
 
 // 脚本泄露报告

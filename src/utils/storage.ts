@@ -18,6 +18,8 @@ export function getSettings(): Promise<Settings> {
         minLevel: 1,
         maxLevel: 6,
         isEnabled: true,
+        contentMaxWidth: 677,
+        hideBottomBar: false,
       };
 
       resolve(data.settings || defaultSettings);
