@@ -25,6 +25,9 @@ const contentWidthProgress = document.getElementById(
 const resetContentWidthButton = document.getElementById(
   "resetContentWidthButton"
 ) as HTMLButtonElement | null;
+const toggleBottomBarButton = document.getElementById(
+  "toggleBottomBarButton"
+) as HTMLButtonElement | null;
 
 // 默认设置
 const defaultSettings: Settings = {
@@ -33,6 +36,7 @@ const defaultSettings: Settings = {
   maxLevel: 6,
   isEnabled: true,
   contentMaxWidth: 677,
+  hideBottomBar: false,
 };
 
 // 上次触发时间
@@ -78,6 +82,8 @@ function updateForm(settings: Settings) {
     contentMaxWidthRange.value = width.toString();
     updateContentWidthProgressUI();
   }
+  // 新增：底部栏隐藏状态
+  updateBottomBarButton(settings.hideBottomBar ?? false);
 }
 
 // 获取当前设置
@@ -205,6 +211,15 @@ function setupEventListeners() {
     updateContentWidthProgressUI();
     await updateContentMaxWidth(width);
     showMessage("已恢复默认内容宽度");
+  });
+
+  // 新增：切换底部栏显示/隐藏
+  toggleBottomBarButton?.addEventListener("click", async () => {
+    const settings = await getSettings();
+    const newValue = !(settings.hideBottomBar ?? false);
+    await updateHideBottomBar(newValue);
+    updateBottomBarButton(newValue);
+    showMessage(newValue ? "已隐藏底部栏" : "已显示底部栏");
   });
 }
 
@@ -340,6 +355,31 @@ async function updateContentMaxWidth(width: number) {
     await notifySettingsChanged(settings);
   } catch (error) {
     console.error("更新内容最大宽度失败:", error);
+  }
+}
+
+// 新增：更新底部栏隐藏状态
+async function updateHideBottomBar(hide: boolean) {
+  try {
+    const settings = await getSettings();
+    settings.hideBottomBar = hide;
+    await saveSettings(settings);
+    await notifySettingsChanged(settings);
+  } catch (error) {
+    console.error("更新底部栏隐藏状态失败:", error);
+  }
+}
+
+// 新增：更新底部栏按钮文本和样式
+function updateBottomBarButton(hide: boolean) {
+  if (!toggleBottomBarButton) return;
+  toggleBottomBarButton.textContent = hide ? "显示底部栏" : "隐藏底部栏";
+  if (hide) {
+    toggleBottomBarButton.classList.remove("secondary");
+    toggleBottomBarButton.classList.add("primary");
+  } else {
+    toggleBottomBarButton.classList.remove("primary");
+    toggleBottomBarButton.classList.add("secondary");
   }
 }
 

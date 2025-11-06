@@ -24,6 +24,7 @@ let settings: Settings;
 let isInitialized = false;
 const CONTENT_WIDTH_STYLE_ID = "wre-content-max-width-style";
 const BOTTOM_BAR_PADDING_STYLE_ID = "wre-bottom-bar-padding-style";
+const BOTTOM_BAR_STYLE_ID = "wre-hide-bottom-bar-style";
 
 /**
  * 初始化插件
@@ -71,6 +72,9 @@ async function init(): Promise<void> {
 
     // 先应用页面内容最大宽度覆盖（无论是否找到文章容器）
     applyContentMaxWidth(settings.contentMaxWidth);
+
+    // 应用底部栏隐藏设置
+    applyHideBottomBar(settings.hideBottomBar);
 
     // 查找文章容器
     const articleContainer = findArticleContainer();
@@ -208,6 +212,11 @@ function handleSettingsChange(newSettings: Settings): void {
     applyContentMaxWidth(newSettings.contentMaxWidth);
   }
 
+  // 单独处理底部栏隐藏：无需完全重建
+  if (newSettings.hideBottomBar !== settings.hideBottomBar) {
+    applyHideBottomBar(newSettings.hideBottomBar);
+  }
+
   // 更新设置
   settings = newSettings;
 }
@@ -273,6 +282,24 @@ function applyContentMaxWidth(width?: number): void {
     document.documentElement.appendChild(paddingStyle);
   } catch (e) {
     console.warn("应用内容最大宽度失败", e);
+  }
+}
+
+// 隐藏/显示底部栏
+function applyHideBottomBar(hide?: boolean): void {
+  try {
+    // 清理旧样式
+    const prev = document.getElementById(BOTTOM_BAR_STYLE_ID);
+    if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+
+    if (!hide) return;
+
+    const style = document.createElement("style");
+    style.id = BOTTOM_BAR_STYLE_ID;
+    style.textContent = "#js_article_bottom_bar{display: none !important;}";
+    document.documentElement.appendChild(style);
+  } catch (e) {
+    console.warn("应用底部栏隐藏失败", e);
   }
 }
 
