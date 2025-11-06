@@ -504,12 +504,38 @@
       </div>
       <div class="range-wrapper">
         <div class="range-track"></div>
-        <div class="range-progress"></div>
+        <div class="range-progress" id="rangeProgress"></div>
         <input type="range" id="tocWidthRange" min="200" max="400" step="10" value="280" title="拖动调整目录宽度" aria-label="拖动调整目录宽度">
       </div>
 
       <div class="buttons">
         <button class="secondary" id="resetButton">恢复默认</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">
+          <svg class="svg-icon" viewBox="0 0 24 24">
+            <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/>
+          </svg>
+        </span>
+        页面内容宽度
+      </div>
+      <div class="card-subtitle">调整公众号文章内容区域的最大宽度（覆盖 677px 默认值）</div>
+
+      <label for="contentMaxWidth">内容最大宽度</label>
+      <div class="flex-between">
+        <input type="number" id="contentMaxWidth" min="480" max="2560" value="677" aria-label="内容最大宽度数值" title="内容最大宽度数值">
+        <span>px</span>
+      </div>
+      <div class="range-wrapper">
+        <div class="range-track"></div>
+        <div class="range-progress" id="contentWidthProgress"></div>
+        <input type="range" id="contentMaxWidthRange" min="480" max="2560" step="10" value="677" title="拖动调整内容最大宽度" aria-label="拖动调整内容最大宽度">
+      </div>
+      <div class="buttons">
+        <button class="secondary" id="resetContentWidthButton">恢复默认</button>
       </div>
     </div>
 

@@ -22,6 +22,8 @@ import { detectAndCleanScriptLeak } from "../utils/safeDOM";
 let tocItems: TocItem[] = [];
 let settings: Settings;
 let isInitialized = false;
+const CONTENT_WIDTH_STYLE_ID = "wre-content-max-width-style";
+const BOTTOM_BAR_PADDING_STYLE_ID = "wre-bottom-bar-padding-style";
 
 /**
  * 初始化插件
@@ -58,6 +60,18 @@ async function init(): Promise<void> {
     // 初始化链接识别器
     initLinkifier();
 
+    // 读取页面内容的实际宽度作为默认宽度（如果设置中没有指定）
+    const actualWidth = getContentActualWidth();
+    if (!settings.contentMaxWidth && actualWidth) {
+      settings.contentMaxWidth = actualWidth;
+      // 保存检测到的宽度到设置中
+      const { saveSettings } = await import("../utils/storage");
+      await saveSettings(settings);
+    }
+
+    // 先应用页面内容最大宽度覆盖（无论是否找到文章容器）
+    applyContentMaxWidth(settings.contentMaxWidth);
+
     // 查找文章容器
     const articleContainer = findArticleContainer();
     if (!articleContainer) {
@@ -70,6 +84,9 @@ async function init(): Promise<void> {
       isInitialized = true;
       return;
     }
+
+    // 再次应用一次，确保在容器出现后样式仍生效
+    applyContentMaxWidth(settings.contentMaxWidth);
 
     // 初始化图片查看器（无论是否有标题元素都初始化）
     initImageViewer();
@@ -186,8 +203,77 @@ function handleSettingsChange(newSettings: Settings): void {
     init();
   }
 
+  // 单独处理内容最大宽度：无需完全重建
+  if (newSettings.contentMaxWidth !== settings.contentMaxWidth) {
+    applyContentMaxWidth(newSettings.contentMaxWidth);
+  }
+
   // 更新设置
   settings = newSettings;
+}
+
+/**
+ * 获取页面内容的实际宽度
+ * @returns 内容区域的实际宽度（像素），如果找不到元素则返回 null
+ */
+function getContentActualWidth(): number | null {
+  try {
+    const contentElement = document.querySelector(
+      ".pages_skin_pc.wx_wap_desktop_fontsize_2 .rich_media_area_primary_inner"
+    ) as HTMLElement;
+
+    if (!contentElement) {
+      console.warn("未找到内容区域元素");
+      return null;
+    }
+
+    // 获取元素的计算样式宽度（排除 padding）
+    const computedStyle = window.getComputedStyle(contentElement);
+    const width = parseFloat(computedStyle.width);
+
+    if (isNaN(width) || width <= 0) {
+      console.warn("无法获取有效的宽度值");
+      return null;
+    }
+
+    console.log(`检测到内容实际宽度: ${width}px`);
+    return Math.round(width);
+  } catch (e) {
+    console.warn("获取内容宽度失败", e);
+    return null;
+  }
+}
+
+// 覆盖公众号文章容器的最大宽度
+function applyContentMaxWidth(width?: number): void {
+  try {
+    // 清理旧样式
+    const prev = document.getElementById(CONTENT_WIDTH_STYLE_ID);
+    if (prev && prev.parentNode) prev.parentNode.removeChild(prev);
+
+    // 清理底部栏 padding 样式
+    const prevPadding = document.getElementById(BOTTOM_BAR_PADDING_STYLE_ID);
+    if (prevPadding && prevPadding.parentNode) prevPadding.parentNode.removeChild(prevPadding);
+
+    if (!width) return;
+
+    // 应用内容最大宽度样式，同时添加左侧 padding
+    const style = document.createElement("style");
+    style.id = CONTENT_WIDTH_STYLE_ID;
+    style.textContent =
+      ".pages_skin_pc.wx_wap_desktop_fontsize_2 .rich_media_area_primary_inner{max-width: " +
+      width +
+      "px !important;padding-left: 250px !important;}";
+    document.documentElement.appendChild(style);
+
+    // 同时为底部栏添加 250px 的左侧 padding
+    const paddingStyle = document.createElement("style");
+    paddingStyle.id = BOTTOM_BAR_PADDING_STYLE_ID;
+    paddingStyle.textContent = "#js_article_bottom_bar{padding-left: 250px !important;}";
+    document.documentElement.appendChild(paddingStyle);
+  } catch (e) {
+    console.warn("应用内容最大宽度失败", e);
+  }
 }
 
 /**

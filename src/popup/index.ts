@@ -12,12 +12,27 @@ const tocWidthRange = document.getElementById(
 const rangeProgress = document.getElementById("rangeProgress") as HTMLElement;
 const resetButton = document.getElementById("resetButton") as HTMLButtonElement;
 
+// 新增：页面内容宽度相关元素
+const contentMaxWidthInput = document.getElementById(
+  "contentMaxWidth"
+) as HTMLInputElement;
+const contentMaxWidthRange = document.getElementById(
+  "contentMaxWidthRange"
+) as HTMLInputElement;
+const contentWidthProgress = document.getElementById(
+  "contentWidthProgress"
+) as HTMLElement;
+const resetContentWidthButton = document.getElementById(
+  "resetContentWidthButton"
+) as HTMLButtonElement | null;
+
 // 默认设置
 const defaultSettings: Settings = {
   tocWidth: 280,
   minLevel: 1,
   maxLevel: 6,
   isEnabled: true,
+  contentMaxWidth: 677,
 };
 
 // 上次触发时间
@@ -25,6 +40,9 @@ let lastTocWidthUpdate = 0;
 // 宽度更新状态
 let pendingWidthUpdate: number | null = null;
 let updateTimeoutId: number | null = null;
+// 新增：内容宽度节流状态
+let pendingContentWidthUpdate: number | null = null;
+let contentUpdateTimeoutId: number | null = null;
 
 // 初始化
 async function init() {
@@ -53,6 +71,13 @@ function updateForm(settings: Settings) {
   tocWidthInput.value = settings.tocWidth.toString();
   tocWidthRange.value = settings.tocWidth.toString();
   updateRangeProgressUI();
+  // 新增：页面内容宽度
+  if (contentMaxWidthInput && contentMaxWidthRange) {
+    const width = settings.contentMaxWidth ?? defaultSettings.contentMaxWidth!;
+    contentMaxWidthInput.value = width.toString();
+    contentMaxWidthRange.value = width.toString();
+    updateContentWidthProgressUI();
+  }
 }
 
 // 获取当前设置
@@ -145,6 +170,42 @@ function setupEventListeners() {
     await updateTocWidth(defaultSettings.tocWidth);
     showMessage("已恢复默认宽度");
   });
+  // 新增：内容宽度输入框
+  contentMaxWidthInput?.addEventListener("input", async () => {
+    const width = parseInt(contentMaxWidthInput.value, 10);
+    if (width >= 480 && width <= 1400) {
+      if (contentMaxWidthRange) contentMaxWidthRange.value = width.toString();
+      updateContentWidthProgressUI();
+      await updateContentMaxWidth(width);
+    }
+  });
+  // 新增：内容宽度滑块
+  contentMaxWidthRange?.addEventListener("input", () => {
+    if (!contentMaxWidthRange || !contentMaxWidthInput) return;
+    const width = parseInt(contentMaxWidthRange.value, 10);
+    contentMaxWidthInput.value = width.toString();
+    updateContentWidthProgressUI();
+    throttledUpdateContentMaxWidth(width);
+  });
+  contentMaxWidthRange?.addEventListener("change", async () => {
+    if (!contentMaxWidthRange) return;
+    const width = parseInt(contentMaxWidthRange.value, 10);
+    if (pendingContentWidthUpdate !== null) {
+      await updateContentMaxWidth(width);
+      pendingContentWidthUpdate = null;
+    }
+  });
+
+  // 新增：恢复默认内容宽度
+  resetContentWidthButton?.addEventListener("click", async () => {
+    if (!contentMaxWidthInput || !contentMaxWidthRange) return;
+    const width = defaultSettings.contentMaxWidth!;
+    contentMaxWidthInput.value = width.toString();
+    contentMaxWidthRange.value = width.toString();
+    updateContentWidthProgressUI();
+    await updateContentMaxWidth(width);
+    showMessage("已恢复默认内容宽度");
+  });
 }
 
 // 处理 logo 图片路径
@@ -199,6 +260,15 @@ function handleRangeInput(this: HTMLInputElement) {
     console.error("rangeProgress element not found!");
   }
 }
+// 新增：更新内容宽度进度条 UI
+function updateContentWidthProgressUI() {
+  if (!contentMaxWidthRange || !contentWidthProgress) return;
+  const min = parseInt(contentMaxWidthRange.min);
+  const max = parseInt(contentMaxWidthRange.max);
+  const value = parseInt(contentMaxWidthRange.value);
+  const percentage = ((value - min) / (max - min)) * 100;
+  contentWidthProgress.style.setProperty("width", `${percentage}%`, "important");
+}
 
 // 节流函数，限制updateTocWidth的调用频率
 function throttledUpdateTocWidth(width: number) {
@@ -242,6 +312,34 @@ async function updateTocWidth(width: number) {
     await notifySettingsChanged(settings);
   } catch (error) {
     console.error("更新宽度失败:", error);
+  }
+}
+
+// 新增：节流更新内容最大宽度
+function throttledUpdateContentMaxWidth(width: number) {
+  pendingContentWidthUpdate = width;
+  const throttleDelay = 500;
+  if (contentUpdateTimeoutId !== null) {
+    window.clearTimeout(contentUpdateTimeoutId);
+    contentUpdateTimeoutId = null;
+  }
+  contentUpdateTimeoutId = window.setTimeout(async () => {
+    if (pendingContentWidthUpdate !== null) {
+      await updateContentMaxWidth(pendingContentWidthUpdate);
+      pendingContentWidthUpdate = null;
+    }
+  }, throttleDelay);
+}
+
+// 新增：更新内容最大宽度
+async function updateContentMaxWidth(width: number) {
+  try {
+    const settings = await getSettings();
+    settings.contentMaxWidth = width;
+    await saveSettings(settings);
+    await notifySettingsChanged(settings);
+  } catch (error) {
+    console.error("更新内容最大宽度失败:", error);
   }
 }
 
