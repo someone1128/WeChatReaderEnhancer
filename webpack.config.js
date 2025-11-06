@@ -2,7 +2,7 @@ const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-module.exports = {
+module.exports = (env, argv) => ({
   entry: {
     popup: "./src/popup/index.ts",
     content: "./src/content/index.ts",
@@ -13,6 +13,8 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     clean: true,
   },
+  // 避免使用 eval 类 SourceMap，满足 MV3 的 CSP 要求
+  devtool: argv && argv.mode === "development" ? "inline-source-map" : false,
   module: {
     rules: [
       {
@@ -48,4 +50,4 @@ module.exports = {
       chunks: "async",
     },
   },
-};
+});
